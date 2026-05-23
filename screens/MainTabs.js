@@ -7,114 +7,144 @@ import {
   ScrollView,
 } from 'react-native';
 
+import {
+  useEffect,
+  useState,
+} from 'react';
+
 import { Ionicons } from '@expo/vector-icons';
+
+import { FINNHUB_API_KEY } from '../config.js';
 
 const Tab = createBottomTabNavigator();
 
 function HomeScreen() {
+
+  const [stocks, setStocks] = useState([]);
+
+  useEffect(() => {
+
+    async function fetchStocks() {
+
+      const tickers = [
+        'AAPL',
+        'NVDA',
+        'TSLA',
+        'AMZN',
+        'META',
+      ];
+
+      try {
+
+        const stockData = await Promise.all(
+
+          tickers.map(async (ticker) => {
+
+            const response = await fetch(
+              `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_API_KEY}`
+            );
+
+            const data = await response.json();
+
+            return {
+              symbol: ticker,
+              price: data.c,
+              change: data.dp,
+            };
+
+          })
+
+        );
+
+        setStocks(stockData);
+
+      } catch (error) {
+        console.log(error);
+      }
+
+    }
+
+    fetchStocks();
+
+  }, []);
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.homeContainer}>
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={styles.headerContainer}>
+
         <Text style={styles.welcome}>
           Welcome Back, Kyle
         </Text>
 
-        <Text style={styles.balance}>
+        <Text style={styles.portfolioValue}>
           $124,892.14
         </Text>
 
-        <Text style={styles.change}>
+        <Text style={styles.dailyChange}>
           +2.14% Today
         </Text>
-      </View>
-
-      {/* Fake Performance Graph */}
-      <View style={styles.graphCard}>
-
-        <View style={styles.timeTabs}>
-          <Text style={styles.activeTab}>1D</Text>
-          <Text style={styles.tab}>1W</Text>
-          <Text style={styles.tab}>1M</Text>
-          <Text style={styles.tab}>1Y</Text>
-          <Text style={styles.tab}>ALL</Text>
-        </View>
-
-        <View style={styles.graph}>
-          <View style={styles.line1} />
-          <View style={styles.line2} />
-          <View style={styles.line3} />
-          <View style={styles.line4} />
-        </View>
 
       </View>
 
-      {/* AI Insight */}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>
+      {/* Live Watchlist */}
+      <View style={styles.liveCard}>
+
+        <Text style={styles.sectionTitle}>
+          Live Watchlist
+        </Text>
+
+        {stocks.map((stock, index) => (
+
+          <View
+            key={index}
+            style={styles.stockRow}
+          >
+
+            <View>
+
+              <Text style={styles.liveTicker}>
+                {stock.symbol}
+              </Text>
+
+              <Text style={styles.livePrice}>
+                ${stock.price}
+              </Text>
+
+            </View>
+
+            <Text
+              style={[
+                styles.liveChange,
+                {
+                  color:
+                    stock.change >= 0
+                      ? '#22C55E'
+                      : '#EF4444',
+                },
+              ]}
+            >
+              {stock.change}%
+            </Text>
+
+          </View>
+
+        ))}
+
+      </View>
+
+      {/* AI Insight Card */}
+      <View style={styles.insightCard}>
+
+        <Text style={styles.insightLabel}>
           WAYPOINT INSIGHT
         </Text>
 
-        <Text style={styles.cardText}>
-          Institutional buying pressure remains elevated across AI infrastructure and semiconductor sectors.
-        </Text>
-      </View>
-
-      {/* Watchlist */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>
-          Watchlist
+        <Text style={styles.insightText}>
+          Semiconductor momentum remains elevated as institutional inflows continue accelerating across major AI equities.
         </Text>
 
-        <View style={styles.stockRow}>
-          <Text style={styles.stockName}>AAPL</Text>
-          <Text style={styles.stockGreen}>+1.21%</Text>
-        </View>
-
-        <View style={styles.stockRow}>
-          <Text style={styles.stockName}>NVDA</Text>
-          <Text style={styles.stockGreen}>+4.83%</Text>
-        </View>
-
-        <View style={styles.stockRow}>
-          <Text style={styles.stockName}>TSLA</Text>
-          <Text style={styles.stockRed}>-0.91%</Text>
-        </View>
-      </View>
-
-      {/* Market Sentiment */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>
-          Market Sentiment
-        </Text>
-
-        <Text style={styles.sentiment}>
-          Bullish Momentum
-        </Text>
-
-        <Text style={styles.sentimentText}>
-          Institutional accumulation continues accelerating across major growth sectors.
-        </Text>
-      </View>
-
-      {/* Trending */}
-      <View style={styles.cardBottom}>
-        <Text style={styles.sectionTitle}>
-          Trending
-        </Text>
-
-        <Text style={styles.news}>
-          Apple preparing major AI ecosystem announcement
-        </Text>
-
-        <Text style={styles.news}>
-          NVIDIA reaches new institutional accumulation highs
-        </Text>
-
-        <Text style={styles.news}>
-          Tesla volatility increases following earnings guidance
-        </Text>
       </View>
 
     </ScrollView>
@@ -123,88 +153,196 @@ function HomeScreen() {
 
 function FeedScreen() {
   return (
-    <ScrollView style={styles.container}>
 
-      <Text style={styles.feedHeader}>
-        Waypoint Intelligence
+    <ScrollView style={styles.feedContainer}>
+
+      <Text style={styles.feedTitle}>
+        Market Intelligence
       </Text>
 
-      {/* Insight Card */}
       <View style={styles.feedCard}>
-        <Text style={styles.feedTag}>
-          AI MARKET SIGNAL
+
+        <Text style={styles.feedLabel}>
+          MARKET INSIGHT
         </Text>
 
-        <Text style={styles.feedTitle}>
-          Semiconductor momentum accelerating
+        <Text style={styles.feedHeadline}>
+          AI infrastructure equities continue outperforming broader technology sectors.
         </Text>
 
         <Text style={styles.feedBody}>
-          Institutional capital continues rotating aggressively into AI infrastructure and chip manufacturers following increased enterprise demand projections.
+          Institutional flows remain concentrated in semiconductor and cloud infrastructure companies following continued enterprise AI expansion.
         </Text>
+
       </View>
 
-      {/* Earnings Alert */}
       <View style={styles.feedCard}>
-        <Text style={styles.feedTag}>
-          EARNINGS ALERT
+
+        <Text style={styles.feedLabel}>
+          MACRO UPDATE
         </Text>
 
-        <Text style={styles.feedTitle}>
-          Tesla volatility increasing
+        <Text style={styles.feedHeadline}>
+          Treasury yields rise following stronger-than-expected labor data.
         </Text>
 
         <Text style={styles.feedBody}>
-          Options activity and analyst revisions suggest elevated movement ahead of earnings guidance updates.
+          Markets showed increased volatility after economic reports suggested continued Federal Reserve caution on future rate cuts.
         </Text>
+
       </View>
 
-      {/* Macro Signal */}
       <View style={styles.feedCard}>
-        <Text style={styles.feedTag}>
-          MACRO SIGNAL
+
+        <Text style={styles.feedLabel}>
+          VOLATILITY ALERT
         </Text>
 
-        <Text style={styles.feedTitle}>
-          Treasury yields stabilizing
-        </Text>
-
-        <Text style={styles.feedBody}>
-          Equity markets may experience temporary relief as bond volatility slows following recent inflation data releases.
-        </Text>
-      </View>
-
-      {/* Sector Rotation */}
-      <View style={styles.feedCardBottom}>
-        <Text style={styles.feedTag}>
-          SECTOR ROTATION
-        </Text>
-
-        <Text style={styles.feedTitle}>
-          Energy sector weakening
+        <Text style={styles.feedHeadline}>
+          Tesla movement expands after revised production guidance.
         </Text>
 
         <Text style={styles.feedBody}>
-          Capital flow indicators show declining institutional positioning across traditional energy sectors while growth equities regain momentum.
+          Elevated options activity and retail participation contributed to increased intraday price movement across EV-related equities.
         </Text>
+
       </View>
 
     </ScrollView>
+
   );
 }
 
 function PortfolioScreen() {
+
+  const portfolio = [
+    {
+      symbol: 'AAPL',
+      shares: 42,
+      value: '$9,842',
+      change: '+3.2%',
+      positive: true,
+    },
+    {
+      symbol: 'NVDA',
+      shares: 18,
+      value: '$14,220',
+      change: '+7.8%',
+      positive: true,
+    },
+    {
+      symbol: 'TSLA',
+      shares: 12,
+      value: '$2,984',
+      change: '-2.1%',
+      positive: false,
+    },
+    {
+      symbol: 'AMZN',
+      shares: 9,
+      value: '$3,118',
+      change: '+1.4%',
+      positive: true,
+    },
+  ];
+
   return (
-    <View style={styles.screen}>
-      <Text style={styles.screenTitle}>Portfolio</Text>
-    </View>
+
+    <ScrollView style={styles.portfolioContainer}>
+
+      {/* Portfolio Header */}
+      <View style={styles.portfolioHeader}>
+
+        <Text style={styles.portfolioLabel}>
+          TOTAL PORTFOLIO
+        </Text>
+
+        <Text style={styles.portfolioTotal}>
+          $248,492
+        </Text>
+
+        <Text style={styles.portfolioGain}>
+          +3.82% This Month
+        </Text>
+
+      </View>
+
+      {/* Holdings */}
+      <View style={styles.portfolioCard}>
+
+        <Text style={styles.sectionTitle}>
+          Holdings
+        </Text>
+
+        {portfolio.map((stock, index) => (
+
+          <View
+            key={index}
+            style={styles.stockRow}
+          >
+
+            <View>
+
+              <Text style={styles.liveTicker}>
+                {stock.symbol}
+              </Text>
+
+              <Text style={styles.holdingShares}>
+                {stock.shares} Shares
+              </Text>
+
+            </View>
+
+            <View style={{ alignItems: 'flex-end' }}>
+
+              <Text style={styles.holdingValue}>
+                {stock.value}
+              </Text>
+
+              <Text
+                style={[
+                  styles.liveChange,
+                  {
+                    color:
+                      stock.positive
+                        ? '#22C55E'
+                        : '#EF4444',
+                  },
+                ]}
+              >
+                {stock.change}
+              </Text>
+
+            </View>
+
+          </View>
+
+        ))}
+
+      </View>
+
+      {/* AI Portfolio Insight */}
+      <View style={styles.insightCard}>
+
+        <Text style={styles.insightLabel}>
+          PORTFOLIO ANALYSIS
+        </Text>
+
+        <Text style={styles.insightText}>
+          Technology exposure remains elevated, with semiconductor equities driving the majority of portfolio growth this quarter.
+        </Text>
+
+      </View>
+
+    </ScrollView>
+
   );
 }
 
 function DiscoverScreen() {
   return (
     <View style={styles.screen}>
-      <Text style={styles.screenTitle}>Discover</Text>
+      <Text style={styles.title}>Discover</Text>
     </View>
   );
 }
@@ -212,7 +350,7 @@ function DiscoverScreen() {
 function ProfileScreen() {
   return (
     <View style={styles.screen}>
-      <Text style={styles.screenTitle}>Profile</Text>
+      <Text style={styles.title}>Profile</Text>
     </View>
   );
 }
@@ -231,10 +369,11 @@ export default function MainTabs() {
           paddingTop: 12,
         },
 
-        tabBarActiveTintColor: '#3B82F6',
+        tabBarActiveTintColor: '#2E5BFF',
         tabBarInactiveTintColor: '#6B7280',
 
         tabBarIcon: ({ color }) => {
+
           let iconName;
 
           if (route.name === 'Home') {
@@ -256,6 +395,7 @@ export default function MainTabs() {
               color={color}
             />
           );
+
         },
       })}
     >
@@ -269,14 +409,28 @@ export default function MainTabs() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+
+  screen: {
     flex: 1,
     backgroundColor: '#050816',
-    paddingTop: 90,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  title: {
+    color: 'white',
+    fontSize: 28,
+    fontWeight: '600',
+  },
+
+  homeContainer: {
+    flex: 1,
+    backgroundColor: '#050816',
+    paddingTop: 100,
     paddingHorizontal: 24,
   },
 
-  header: {
+  headerContainer: {
     marginBottom: 30,
   },
 
@@ -285,114 +439,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
-  balance: {
+  portfolioValue: {
     color: 'white',
-    fontSize: 44,
+    fontSize: 42,
     fontWeight: '700',
-    marginTop: 10,
+    marginTop: 12,
   },
 
-  change: {
+  dailyChange: {
     color: '#3B82F6',
     fontSize: 18,
     marginTop: 8,
   },
 
-  graphCard: {
+  liveCard: {
     backgroundColor: '#0D1320',
     borderRadius: 24,
     padding: 24,
-    marginBottom: 24,
+    marginTop: 20,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
-  },
-
-  timeTabs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-
-  activeTab: {
-    color: '#3B82F6',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-
-  tab: {
-    color: '#7E8BA3',
-    fontSize: 15,
-  },
-
-  graph: {
-    height: 160,
-    justifyContent: 'center',
-  },
-
-  line1: {
-    height: 3,
-    width: '60%',
-    backgroundColor: '#2563EB',
-    borderRadius: 20,
-    marginBottom: 18,
-    transform: [{ rotate: '4deg' }],
-  },
-
-  line2: {
-    height: 3,
-    width: '82%',
-    backgroundColor: '#3B82F6',
-    borderRadius: 20,
-    marginBottom: 18,
-    transform: [{ rotate: '-2deg' }],
-  },
-
-  line3: {
-    height: 3,
-    width: '75%',
-    backgroundColor: '#60A5FA',
-    borderRadius: 20,
-    marginBottom: 18,
-    transform: [{ rotate: '3deg' }],
-  },
-
-  line4: {
-    height: 3,
-    width: '95%',
-    backgroundColor: '#93C5FD',
-    borderRadius: 20,
-    transform: [{ rotate: '-4deg' }],
-  },
-
-  card: {
-    backgroundColor: '#0D1320',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-
-  cardBottom: {
-    backgroundColor: '#0D1320',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 120,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-
-  cardLabel: {
-    color: '#3B82F6',
-    fontSize: 13,
-    letterSpacing: 2,
-    marginBottom: 16,
-  },
-
-  cardText: {
-    color: 'white',
-    fontSize: 18,
-    lineHeight: 28,
   },
 
   sectionTitle: {
@@ -405,45 +471,60 @@ const styles = StyleSheet.create({
   stockRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    alignItems: 'center',
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
   },
 
-  stockName: {
-    color: 'white',
-    fontSize: 18,
-  },
-
-  stockGreen: {
-    color: '#22C55E',
-    fontSize: 18,
-  },
-
-  stockRed: {
-    color: '#EF4444',
-    fontSize: 18,
-  },
-
-  sentiment: {
+  liveTicker: {
     color: '#3B82F6',
-    fontSize: 28,
+    fontSize: 18,
+  },
+
+  livePrice: {
+    color: 'white',
+    fontSize: 26,
     fontWeight: '700',
+    marginTop: 6,
   },
 
-  sentimentText: {
-    color: '#B8C2D6',
-    fontSize: 16,
-    lineHeight: 26,
-    marginTop: 14,
+  liveChange: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 
-  news: {
-    color: '#D6DEED',
-    fontSize: 17,
-    lineHeight: 28,
-    marginTop: 18,
+  insightCard: {
+    backgroundColor: '#0D1320',
+    borderRadius: 24,
+    padding: 24,
+    marginTop: 24,
+    marginBottom: 120,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
   },
 
-  feedHeader: {
+  insightLabel: {
+    color: '#3B82F6',
+    fontSize: 13,
+    letterSpacing: 2,
+    marginBottom: 18,
+  },
+
+  insightText: {
+    color: 'white',
+    fontSize: 20,
+    lineHeight: 32,
+  },
+
+  feedContainer: {
+    flex: 1,
+    backgroundColor: '#050816',
+    paddingTop: 100,
+    paddingHorizontal: 24,
+  },
+
+  feedTitle: {
     color: 'white',
     fontSize: 34,
     fontWeight: '700',
@@ -459,45 +540,76 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.05)',
   },
 
-  feedCardBottom: {
-    backgroundColor: '#0D1320',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 120,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-
-  feedTag: {
+  feedLabel: {
     color: '#3B82F6',
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 2,
-    marginBottom: 14,
+    marginBottom: 16,
   },
 
-  feedTitle: {
+  feedHeadline: {
     color: 'white',
     fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 14,
+    lineHeight: 34,
+    fontWeight: '600',
   },
 
   feedBody: {
-    color: '#C7D0E0',
-    fontSize: 16,
-    lineHeight: 28,
+    color: '#B8C2D6',
+    fontSize: 17,
+    lineHeight: 30,
+    marginTop: 18,
   },
 
-  screen: {
+  portfolioContainer: {
     flex: 1,
     backgroundColor: '#050816',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: 100,
+    paddingHorizontal: 24,
   },
 
-  screenTitle: {
+  portfolioHeader: {
+    marginBottom: 30,
+  },
+
+  portfolioLabel: {
+    color: '#8B9BB8',
+    fontSize: 14,
+    letterSpacing: 2,
+  },
+
+  portfolioTotal: {
     color: 'white',
-    fontSize: 32,
+    fontSize: 48,
+    fontWeight: '700',
+    marginTop: 14,
+  },
+
+  portfolioGain: {
+    color: '#22C55E',
+    fontSize: 18,
+    marginTop: 10,
+  },
+
+  portfolioCard: {
+    backgroundColor: '#0D1320',
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+    marginBottom: 24,
+  },
+
+  holdingShares: {
+    color: '#8B9BB8',
+    fontSize: 15,
+    marginTop: 6,
+  },
+
+  holdingValue: {
+    color: 'white',
+    fontSize: 20,
     fontWeight: '600',
   },
+
 });

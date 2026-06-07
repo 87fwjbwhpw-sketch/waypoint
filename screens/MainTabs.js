@@ -137,13 +137,28 @@ function HomeScreen() {
       {/* AI Insight Card */}
       <View style={styles.insightCard}>
 
-        <Text style={styles.insightLabel}>
-          WAYPOINT INSIGHT
-        </Text>
+       <Text style={styles.insightLabel}>
+  WAYPOINT INSIGHT
+</Text>
 
-        <Text style={styles.insightText}>
-          Semiconductor momentum remains elevated as institutional inflows continue accelerating across major AI equities.
-        </Text>
+<View style={styles.confidenceContainer}>
+  <View style={styles.confidenceBar}>
+    <View
+      style={[
+        styles.confidenceFill,
+        { width: '82%' }
+      ]}
+    />
+  </View>
+
+  <Text style={styles.confidenceText}>
+    Confidence: 82% • HIGH
+  </Text>
+</View>
+
+<Text style={styles.insightText}>
+  Semiconductor momentum remains elevated as institutional inflows continue accelerating across major AI equities.
+</Text>
 
       </View>
 
@@ -340,18 +355,130 @@ function PortfolioScreen() {
 }
 
 function DiscoverScreen() {
+
+  const trendingStocks = [
+    'NVDA',
+    'AMD',
+    'AAPL',
+    'META',
+    'TSLA',
+  ];
+
+  const themes = [
+    'Artificial Intelligence',
+    'Cybersecurity',
+    'Robotics',
+    'Cloud Infrastructure',
+    'Energy',
+    'Biotech',
+  ];
+
   return (
-    <View style={styles.screen}>
-      <Text style={styles.title}>Discover</Text>
-    </View>
+
+    <ScrollView style={styles.discoverContainer}>
+
+      <Text style={styles.discoverTitle}>
+        Discover
+      </Text>
+
+      {/* Trending Stocks */}
+      <View style={styles.discoverCard}>
+
+        <Text style={styles.sectionTitle}>
+          Trending Stocks
+        </Text>
+
+        {trendingStocks.map((stock, index) => (
+          <Text
+            key={index}
+            style={styles.discoverItem}
+          >
+            {stock}
+          </Text>
+        ))}
+
+      </View>
+
+      {/* Emerging Themes */}
+      <View style={styles.discoverCard}>
+
+        <Text style={styles.sectionTitle}>
+          Emerging Themes
+        </Text>
+
+        {themes.map((theme, index) => (
+          <Text
+            key={index}
+            style={styles.discoverItem}
+          >
+            {theme}
+          </Text>
+        ))}
+
+      </View>
+
+      {/* Waypoint Opportunity */}
+      <View style={styles.insightCard}>
+
+        <Text style={styles.insightLabel}>
+          WAYPOINT OPPORTUNITY
+        </Text>
+
+        <Text style={styles.insightText}>
+          AI infrastructure demand continues supporting semiconductor and cloud-computing equities as enterprise adoption accelerates.
+        </Text>
+
+      </View>
+
+    </ScrollView>
+
   );
 }
 
 function ProfileScreen() {
+
   return (
-    <View style={styles.screen}>
-      <Text style={styles.title}>Profile</Text>
-    </View>
+
+    <ScrollView style={styles.profileContainer}>
+
+      <Text style={styles.profileTitle}>
+        Profile
+      </Text>
+
+      <View style={styles.profileCard}>
+        <Text style={styles.profileLabel}>ACCOUNT</Text>
+        <Text style={styles.profileItem}>Kyle</Text>
+      </View>
+
+      <View style={styles.profileCard}>
+        <Text style={styles.profileLabel}>WATCHLISTS</Text>
+        <Text style={styles.profileItem}>Technology</Text>
+        <Text style={styles.profileItem}>Artificial Intelligence</Text>
+        <Text style={styles.profileItem}>Semiconductors</Text>
+      </View>
+
+      <View style={styles.profileCard}>
+        <Text style={styles.profileLabel}>RISK PROFILE</Text>
+        <Text style={styles.profileItem}>Moderate Growth</Text>
+      </View>
+
+      <View style={styles.profileCard}>
+        <Text style={styles.profileLabel}>NOTIFICATIONS</Text>
+        <Text style={styles.profileItem}>Market Alerts Enabled</Text>
+      </View>
+
+      <View style={styles.insightCard}>
+        <Text style={styles.insightLabel}>
+          WAYPOINT PROFILE INSIGHT
+        </Text>
+
+        <Text style={styles.insightText}>
+          Your interests currently align most closely with technology, AI infrastructure, and high-growth equities.
+        </Text>
+      </View>
+
+    </ScrollView>
+
   );
 }
 
@@ -606,10 +733,96 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 
-  holdingValue: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '600',
-  },
+holdingValue: {
+  color: 'white',
+  fontSize: 20,
+  fontWeight: '600',
+},
+
+discoverContainer: {
+  flex: 1,
+  backgroundColor: '#050816',
+  paddingTop: 100,
+  paddingHorizontal: 24,
+},
+
+discoverTitle: {
+  color: 'white',
+  fontSize: 34,
+  fontWeight: '700',
+  marginBottom: 30,
+},
+
+discoverCard: {
+  backgroundColor: '#0D1320',
+  borderRadius: 24,
+  padding: 24,
+  marginBottom: 24,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.05)',
+},
+
+discoverItem: {
+  color: 'white',
+  fontSize: 18,
+  marginBottom: 14,
+},
+profileContainer: {
+  flex: 1,
+  backgroundColor: '#050816',
+  paddingTop: 100,
+  paddingHorizontal: 24,
+},
+
+profileTitle: {
+  color: 'white',
+  fontSize: 34,
+  fontWeight: '700',
+  marginBottom: 30,
+},
+
+profileCard: {
+  backgroundColor: '#0D1320',
+  borderRadius: 24,
+  padding: 24,
+  marginBottom: 24,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.05)',
+},
+
+profileLabel: {
+  color: '#3B82F6',
+  fontSize: 13,
+  letterSpacing: 2,
+  marginBottom: 14,
+},
+
+profileItem: {
+  color: 'white',
+  fontSize: 18,
+  marginBottom: 10,
+},
+confidenceContainer: {
+  marginBottom: 20,
+},
+
+confidenceBar: {
+  height: 10,
+  backgroundColor: '#1E293B',
+  borderRadius: 10,
+  overflow: 'hidden',
+  marginBottom: 10,
+},
+
+confidenceFill: {
+  height: '100%',
+  backgroundColor: '#3B82F6',
+  borderRadius: 10,
+},
+
+confidenceText: {
+  color: '#8B9BB8',
+  fontSize: 14,
+},
 
 });

@@ -167,6 +167,32 @@ function HomeScreen() {
 }
 
 function FeedScreen() {
+
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+
+  async function fetchNews() {
+
+    try {
+
+      const response = await fetch(
+        `https://finnhub.io/api/v1/news?category=general&token=${FINNHUB_API_KEY}`
+      );
+
+      const data = await response.json();
+
+      setNews(data.slice(0, 5));
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
+  fetchNews();
+
+}, []);
   return (
 
     <ScrollView style={styles.feedContainer}>
@@ -175,53 +201,57 @@ function FeedScreen() {
         Market Intelligence
       </Text>
 
-      <View style={styles.feedCard}>
+      
 
-        <Text style={styles.feedLabel}>
-          MARKET INSIGHT
-        </Text>
+{news.map((article, index) => (
 
-        <Text style={styles.feedHeadline}>
-          AI infrastructure equities continue outperforming broader technology sectors.
-        </Text>
+  <View
+    key={index}
+    style={styles.feedCard}
+  >
 
-        <Text style={styles.feedBody}>
-          Institutional flows remain concentrated in semiconductor and cloud infrastructure companies following continued enterprise AI expansion.
-        </Text>
+    <Text style={styles.feedLabel}>
+      LIVE MARKET NEWS
+    </Text>
 
+   <Text style={styles.feedHeadline}>
+  {article.headline}
+</Text>
+
+<Text style={styles.feedSource}>
+  Source: {article.source}
+</Text>
+
+<Text style={styles.feedBody}>
+  {article.summary}
+</Text>
+
+    <Text style={styles.feedLabel}>
+      WHY IT MATTERS
+    </Text>
+
+    <Text style={styles.feedBody}>
+      This event may influence investor sentiment and increase market volatility depending on how economic and geopolitical conditions develop.
+    </Text>
+
+    <View style={styles.confidenceContainer}>
+      <View style={styles.confidenceBar}>
+        <View
+          style={[
+            styles.confidenceFill,
+            { width: '75%' }
+          ]}
+        />
       </View>
 
-      <View style={styles.feedCard}>
+      <Text style={styles.confidenceText}>
+        Confidence: 75% • MODERATE
+      </Text>
+    </View>
 
-        <Text style={styles.feedLabel}>
-          MACRO UPDATE
-        </Text>
+  </View>
 
-        <Text style={styles.feedHeadline}>
-          Treasury yields rise following stronger-than-expected labor data.
-        </Text>
-
-        <Text style={styles.feedBody}>
-          Markets showed increased volatility after economic reports suggested continued Federal Reserve caution on future rate cuts.
-        </Text>
-
-      </View>
-
-      <View style={styles.feedCard}>
-
-        <Text style={styles.feedLabel}>
-          VOLATILITY ALERT
-        </Text>
-
-        <Text style={styles.feedHeadline}>
-          Tesla movement expands after revised production guidance.
-        </Text>
-
-        <Text style={styles.feedBody}>
-          Elevated options activity and retail participation contributed to increased intraday price movement across EV-related equities.
-        </Text>
-
-      </View>
+))}
 
     </ScrollView>
 
@@ -687,6 +717,13 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     marginTop: 18,
   },
+
+  feedSource: {
+  color: '#8B9BB8',
+  fontSize: 14,
+  marginTop: 10,
+  marginBottom: 10,
+},
 
   portfolioContainer: {
     flex: 1,

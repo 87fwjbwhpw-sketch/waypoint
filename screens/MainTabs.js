@@ -201,33 +201,75 @@ function generateInsight(headline) {
 
   return 'Market participants may adjust positioning as new information becomes available.';
 }
+function getConfidence(headline) {
+
+  const text = headline.toLowerCase();
+
+  if (
+    text.includes('ai') ||
+    text.includes('nvidia') ||
+    text.includes('semiconductor')
+  ) {
+    return {
+      score: 85,
+      label: 'HIGH',
+    };
+  }
+
+  if (
+    text.includes('fed') ||
+    text.includes('inflation') ||
+    text.includes('rates')
+  ) {
+    return {
+      score: 72,
+      label: 'MODERATE',
+    };
+  }
+
+  if (
+    text.includes('oil') ||
+    text.includes('energy')
+  ) {
+    return {
+      score: 68,
+      label: 'MODERATE',
+    };
+  }
+
+  return {
+    score: 58,
+    label: 'LOW',
+  };
+}
 function FeedScreen() {
 
   const [news, setNews] = useState([]);
 
   useEffect(() => {
 
-  async function fetchNews() {
+    async function fetchNews() {
 
-    try {
+      try {
 
-      const response = await fetch(
-        `https://finnhub.io/api/v1/news?category=general&token=${FINNHUB_API_KEY}`
-      );
+        const response = await fetch(
+          `https://finnhub.io/api/v1/news?category=general&token=${FINNHUB_API_KEY}`
+        );
 
-      const data = await response.json();
+        const data = await response.json();
 
-      setNews(data.slice(0, 5));
+        setNews(data.slice(0, 5));
 
-    } catch (error) {
-      console.log(error);
+      } catch (error) {
+        console.log(error);
+      }
+
     }
 
-  }
+    fetchNews();
 
-  fetchNews();
+  }, []);
 
-}, []);
   return (
 
     <ScrollView style={styles.feedContainer}>
@@ -236,57 +278,62 @@ function FeedScreen() {
         Market Intelligence
       </Text>
 
-      
+      {news.map((article, index) => {
 
-{news.map((article, index) => (
+        const confidence = getConfidence(article.headline);
+        console.log(article.headline, confidence);
 
-  <View
-    key={index}
-    style={styles.feedCard}
-  >
+        return (
 
-    <Text style={styles.feedLabel}>
-      LIVE MARKET NEWS
-    </Text>
+          <View
+            key={index}
+            style={styles.feedCard}
+          >
 
-   <Text style={styles.feedHeadline}>
-  {article.headline}
-</Text>
+            <Text style={styles.feedLabel}>
+              LIVE MARKET NEWS
+            </Text>
 
-<Text style={styles.feedSource}>
-  Source: {article.source}
-</Text>
+            <Text style={styles.feedHeadline}>
+              {article.headline}
+            </Text>
 
-<Text style={styles.feedBody}>
-  {article.summary}
-</Text>
+            <Text style={styles.feedSource}>
+              Source: {article.source}
+            </Text>
 
-    <Text style={styles.feedLabel}>
-      WHY IT MATTERS
-    </Text>
+            <Text style={styles.feedBody}>
+              {article.summary}
+            </Text>
 
-    <Text style={styles.feedBody}>
-  {generateInsight(article.headline)}
-</Text>
+            <Text style={styles.feedLabel}>
+              WHY IT MATTERS
+            </Text>
 
-    <View style={styles.confidenceContainer}>
-      <View style={styles.confidenceBar}>
-        <View
-          style={[
-            styles.confidenceFill,
-            { width: '75%' }
-          ]}
-        />
-      </View>
+            <Text style={styles.feedBody}>
+              {generateInsight(article.headline)}
+            </Text>
 
-      <Text style={styles.confidenceText}>
-        Confidence: 75% • MODERATE
-      </Text>
-    </View>
+            <View style={styles.confidenceContainer}>
+              <View style={styles.confidenceBar}>
+                <View
+                  style={[
+                    styles.confidenceFill,
+                    { width: `${confidence.score}%` }
+                  ]}
+                />
+              </View>
 
-  </View>
+              <Text style={styles.confidenceText}>
+                Confidence: {confidence.score}% • {confidence.label}
+              </Text>
+            </View>
 
-))}
+          </View>
+
+        );
+
+      })}
 
     </ScrollView>
 
@@ -330,7 +377,6 @@ function PortfolioScreen() {
 
     <ScrollView style={styles.portfolioContainer}>
 
-      {/* Portfolio Header */}
       <View style={styles.portfolioHeader}>
 
         <Text style={styles.portfolioLabel}>
@@ -347,7 +393,6 @@ function PortfolioScreen() {
 
       </View>
 
-      {/* Holdings */}
       <View style={styles.portfolioCard}>
 
         <Text style={styles.sectionTitle}>
@@ -401,7 +446,6 @@ function PortfolioScreen() {
 
       </View>
 
-      {/* AI Portfolio Insight */}
       <View style={styles.insightCard}>
 
         <Text style={styles.insightLabel}>
@@ -418,7 +462,6 @@ function PortfolioScreen() {
 
   );
 }
-
 function DiscoverScreen() {
 
   const trendingStocks = [

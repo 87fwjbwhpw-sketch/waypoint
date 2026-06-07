@@ -165,7 +165,42 @@ function HomeScreen() {
     </ScrollView>
   );
 }
+function generateInsight(headline) {
 
+  const text = headline.toLowerCase();
+
+  if (
+    text.includes('ai') ||
+    text.includes('nvidia') ||
+    text.includes('semiconductor')
+  ) {
+    return 'AI infrastructure demand continues supporting semiconductor and data-center related equities.';
+  }
+
+  if (
+    text.includes('oil') ||
+    text.includes('energy')
+  ) {
+    return 'Energy markets may experience increased volatility as supply and demand expectations shift.';
+  }
+
+  if (
+    text.includes('fed') ||
+    text.includes('inflation') ||
+    text.includes('rates')
+  ) {
+    return 'Interest rate expectations may impact equity valuations and broader market sentiment.';
+  }
+
+  if (
+    text.includes('tesla') ||
+    text.includes('ev')
+  ) {
+    return 'Electric vehicle equities may experience elevated volatility as growth expectations change.';
+  }
+
+  return 'Market participants may adjust positioning as new information becomes available.';
+}
 function FeedScreen() {
 
   const [news, setNews] = useState([]);
@@ -231,8 +266,8 @@ function FeedScreen() {
     </Text>
 
     <Text style={styles.feedBody}>
-      This event may influence investor sentiment and increase market volatility depending on how economic and geopolitical conditions develop.
-    </Text>
+  {generateInsight(article.headline)}
+</Text>
 
     <View style={styles.confidenceContainer}>
       <View style={styles.confidenceBar}>
